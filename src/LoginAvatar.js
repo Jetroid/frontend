@@ -5,7 +5,7 @@ import FlatButton from "material-ui/FlatButton";
 import IconMenu from "material-ui/IconMenu";
 import IconButton from "material-ui/IconButton";
 import { Link } from "react-router-dom";
-import { injectIntl } from "react-intl";
+import { injectIntl, FormattedMessage } from "react-intl";
 import "./LoginAvatar.css";
 import authService from "./utils/AuthService";
 
@@ -22,6 +22,17 @@ export class LoginAvatar extends React.Component {
     }
   }
 
+  // componentDidMount() {
+  //   this.props.addSteps([
+  //     {
+  //       title: 'Quick Submit',
+  //       text: 'Scroll to correct position if required. <i>It can be turned off</i>',
+  //       selector: '.createButton',
+  //       position: 'top',
+  //     },
+  //   ]);
+  // }
+
   render() {
     const { isAuthenticated } = authService;
     let buttonStyle = { color: "black" };
@@ -30,46 +41,66 @@ export class LoginAvatar extends React.Component {
 
     if (isAuthenticated() && this.state.profile !== {}) {
       return (
-        <div className="avatar">
-          <IconMenu
-            iconButtonElement={
-              <IconButton>
-                <Avatar
-                  size={35}
-                  src={
-                    profile.user_metadata && profile.user_metadata.customPic
-                      ? profile.user_metadata.customPic
-                      : profile.picture
-                  }
-                />
-              </IconButton>
-            }
-            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-            targetOrigin={{ horizontal: "right", vertical: "top" }}
+        <div>
+          <Link
+            className="d-none d-sm-block d-md-block d-lg-block d-xl-block"
+            to="/new"
           >
-            <MenuItem
-              style={buttonStyle}
-              containerElement={<Link to={"/profile"} />}
-              onClick={this.handleClose}
+            <div className="createButton">
+              <FormattedMessage id="quick_submit" />
+            </div>
+          </Link>
+          <div className="avatar">
+            <IconMenu
+              iconButtonElement={
+                <IconButton>
+                  <Avatar
+                    size={30}
+                    src={
+                      profile.user_metadata && profile.user_metadata.customPic
+                        ? profile.user_metadata.customPic
+                        : profile.picture
+                    }
+                  />
+                </IconButton>
+              }
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              targetOrigin={{ horizontal: "right", vertical: "top" }}
             >
-              Profile
-            </MenuItem>
-            <MenuItem
-              style={buttonStyle}
-              primaryText={intl.formatMessage({ id: "sign_out" })}
-              onClick={() => authService.logout()}
-            />
-          </IconMenu>
+              <MenuItem
+                style={buttonStyle}
+                containerElement={<Link to={"/profile"} />}
+                onClick={this.handleClose}
+              >
+                Profile
+              </MenuItem>
+              <MenuItem
+                style={buttonStyle}
+                primaryText={intl.formatMessage({ id: "sign_out" })}
+                onClick={() => authService.logout()}
+              />
+            </IconMenu>
+          </div>
         </div>
       );
     } else {
       return (
-        <div className="loginButton">
-          <FlatButton
-            onClick={() => authService.login()}
-            onTouchTap={this.signIn}
-            label={intl.formatMessage({ id: "login" })}
-          />
+        <div>
+          <Link
+            className="d-none d-sm-block d-md-block d-lg-block d-xl-block"
+            to="/new"
+          >
+            <div className="createButton">
+              <FormattedMessage id="quick_submit" />
+            </div>
+          </Link>
+          <div className="loginButton">
+            <FlatButton
+              onClick={() => authService.login()}
+              onTouchTap={this.signIn}
+              label={intl.formatMessage({ id: "login" })}
+            />
+          </div>
         </div>
       );
     }

@@ -10,9 +10,15 @@ import "./CaseEditor.css";
 import "./GeoSuggest/GeoSuggest.css";
 import RelatedEditor from "./RelatedEditor";
 import RaisedButton from "material-ui/RaisedButton";
+import FloatingActionButton from "material-ui/FloatingActionButton";
+import Publish from "material-ui/svg-icons/editor/publish";
 import fix_related from "./fix-related.js";
 import { encodeLocation } from "./geoutils";
+<<<<<<< HEAD
 import PublishIcon from "material-ui/svg-icons/editor/publish";
+=======
+import Joyride from 'react-joyride';
+>>>>>>> 5037122... added feature tour, need to add handler to privateRoute
 import {
   makeLocalizedChoiceField,
   makeLocalizedBooleanField,
@@ -42,8 +48,31 @@ class CaseEditor extends Component {
         id: "case_description_placeholder"
       });
     }
-    this.state = { thing };
+    this.state = { 
+      thing, 
+      joyrideOverlay: true,
+      joyrideType: 'continuous',
+      isRunning: true,
+      stepIndex: 0,
+    };
     this.updateBody = this.updateBody.bind(this);
+    this.goFullSubmit = this.goFullSubmit.bind(this);
+    this.callback = this.callback.bind(this);
+    this.next = this.next.bind(this);
+  }
+
+  next() {
+    this.joyride.next();
+  }
+
+  callback(data) {
+
+  }
+
+  goFullSubmit() {
+    this.setState({
+      steps: null,
+    });
   }
 
   updateBody(body) {
@@ -140,27 +169,74 @@ class CaseEditor extends Component {
       : "edit_full_version";
     let quickSubmitText = "publish";
     let fullSubmitText = "publish";
+    const {
+      isRunning,
+      joyrideOverlay,
+      joyrideType,
+      stepIndex,
+    } = this.state;
+    let steps;
+    isQuick & !incomplete ? 
+      steps = [
+        {
+          title: 'Do Full Version',
+          text: 'There’s more information you can add about this case. Click here to enter more details, including a narrative description. The information you’ve already entered will carry over to the full version.',
+          selector: '.full-submit',
+          position: 'top',
+          type: 'hover',
+        },
+        {
+          title: 'Submit',
+          text: 'Click here to publish this article. Don’t leave the page without clicking this button, as your work won’t be saved. You can publish at any time and return to edit any article later. Articles that you have published will be saved to your profile page.',
+          selector: '.submitUIButton',
+          isFixed: true,
+          position: 'top',
+          type: 'hover',
+        },
+      ]
+     :
+      steps = []
     return (
-      <Form
-        onSubmit={onSubmit}
-        state={thing}
-        onChange={changes => this.setState({ thing: changes })}
-      >
-        <div className="main-contents">
-          <Container className="detailed-case-component" fluid>
-            <Col
-              md="3"
-              className="d-none d-sm-block d-md-block d-lg-block d-xl-block sidepanel"
-            />
-            <Col md="6" className="ml-auto mr-auto">
-              <div className="case-box">
-                <div className="field-case top">
-                  <h2 className="sub-heading">
+      <div>
+        <Joyride
+          ref={c => (this.joyride = c)}
+          callback={this.callback}
+          debug={false}
+          allowClicksThruHole={true}
+          locale={{
+            back: (<span>Back</span>),
+            close: (<span>Close</span>),
+            last: (<span>Last</span>),
+            next: (<span>Next</span>),
+            skip: (<span>Skip</span>),
+          }}
+          run={isRunning}
+          showOverlay={joyrideOverlay}
+          showSkipButton={true}
+          showStepsProgress={true}
+          stepIndex={stepIndex}
+          steps={steps}
+          type={joyrideType}
+        />
+        <Form
+          onSubmit={onSubmit}
+          state={thing}
+          onChange={changes => this.setState({ thing: changes })}
+        >
+          <div className="main-contents">
+            <Container className="detailed-case-component" fluid>
+              <Col
+                md="3"
+                className="d-none d-sm-block d-md-block d-lg-block d-xl-block sidepanel"
+              />
+              <Col md="6" className="ml-auto mr-auto">
+                <div className="case-box">
+                  <div className="sub-heading top">
                     <label htmlFor="title">
                       <FormattedMessage id={thing.type + "_title_label"} />
                     </label>
-                  </h2>
-                  <p className="explanatory-text"><FormattedMessage
+                  </div>
+                  <p className="m-0"><FormattedMessage
                     id={intl.formatMessage({
                       id: thing.type + "_title_placeholder"
                     })}/></p>
@@ -172,197 +248,196 @@ class CaseEditor extends Component {
                     placeholder=""
                     fullWidth
                   />
-                </div>
-                {makeLocalizedChoiceField(
-                  intl,
-                  "issue",
-                  "issue",
-                  "general_issues"
-                )}
-                {issue && !isQuick ? (
-                  <div>
-                    {makeLocalizedChoiceField(
-                      intl,
-                      "specific_topic",
-                      issue,
-                      "specific_topic"
-                    )}
+                  {makeLocalizedChoiceField(
+                    intl,
+                    "issue",
+                    "issue",
+                    "general_issues"
+                  )}
+                  {issue && !isQuick ? (
+                    <div>
+                      {makeLocalizedChoiceField(
+                        intl,
+                        "specific_topic",
+                        issue,
+                        "specific_topic"
+                      )}
+                    </div>
+                  ) : (
+                    undefined
+                  )}
+                  {issue === "other" &&
+                  this.state.thing.specific_topic === "other" ? (
+                    <b>
+                      {intl.formatMessage({
+                        id: "send_email_with_catgeory_additions"
+                      })}
+                    </b>
+                  ) : (
+                    undefined
+                  )}
+                  <div className="case-location">
+                    {makeLocalizedLocationField(intl, "location")}
+                    <p className="sub-heading">
+                      <FormattedMessage id="date" />
+                    </p>
+                    {makeLocalizedDateField(intl, "start_date")}
+                    {makeLocalizedDateField(intl, "end_date")}
+                    <p className="sub-heading">
+                      <FormattedMessage id="links" />
+                    </p>
+                    {makeLocalizedListField(intl, "links")}
                   </div>
-                ) : (
-                  undefined
-                )}
-                {issue === "other" &&
-                this.state.thing.specific_topic === "other" ? (
-                  <b>
-                    {intl.formatMessage({
-                      id: "send_email_with_catgeory_additions"
-                    })}
-                  </b>
-                ) : (
-                  undefined
-                )}
-                <div className="case-location">
-                  {makeLocalizedLocationField(intl, "location")}
-                </div>
-                <div className="field-case">
-                  <h2 className="sub-heading">
-                    <FormattedMessage id="date" />
-                  </h2>
-                  {makeLocalizedDateField(intl, "start_date")}
-                  {makeLocalizedDateField(intl, "end_date")}
-                </div>
-                <div className="field-case">
-                  <h2 className="sub-heading">
-                    <FormattedMessage id="links" />
-                  </h2>
-                  {makeLocalizedListField(intl, "links")}
-                </div>
-                <div className="field-case media">
-                  <h2 className="sub-heading">
+                  <p className="sub-heading">
                     <FormattedMessage id="media" />
-                  </h2>
-                  <h3 className="sub-sub-heading">
+                  </p>
+                  <p className="sub-sub-heading">
                     <FormattedMessage id="photos" />
-                  </h3>
+                  </p>
                   <ImageListEditor property="images" thing={thing} />
-                  <h3 className="sub-sub-heading pt-3">
+                  <p className="sub-sub-heading">
                     <FormattedMessage id="videos" />
-                  </h3>
+                  </p>
                   {makeLocalizedListField(intl, "videos")}
-                </div>
-                <div className={isQuick? "field-case last" : "field-case"}>
-                  <h2 className="sub-heading">
+                  <p className="sub-heading">
                     <FormattedMessage id="tags_title" />
-                  </h2>
+                  </p>
                   {tagseditor}
                 </div>
-              </div>
-              <div>
-                {isQuick ? (
-                  <div>
-                    {incomplete ? (
-                      <div className="incomplete pt-4">
-                        <FormattedMessage id={"incomplete_" + thing.type} />
-                      </div>
-                    ) : null}
-                    <RaisedButton
-                      className="publish left customButton"
-                      disabled={incomplete}
-                      label="Label after"
-                      labelPosition="after"
-                      icon={<PublishIcon />}
-                      secondary
-                      style={buttonStyle}
-                      type="submit"
-                      label={intl.formatMessage({
-                        id: quickSubmitText
-                      })}
-                    />
-                    <span><FormattedMessage id="or" /></span>
-                    <RaisedButton
-                      onClick={() => onExpand(this.state.thing)}
-                      className="customButton full-submit"
-                      style={buttonStyle}
-                      primary
-                      label={intl.formatMessage({ id: doFullVersion })}
-                    />
-                  </div>
-                ) : (
-                  <div>
-                    <div className="field-case">
-                      <h2 className="sub-heading" htmlFor="body_en">
-                        {intl.formatMessage({
-                          id: thing.type + "_body_title"
-                        })}
-                      </h2>
-                      <BodyEditor onEditorChange={this.updateBody} html={thing.body} />
-                    </div>
+                <div>
+                  {isQuick ? (
                     <div>
-                      {makeLocalizedChoiceField(intl, "communication_mode")}
-                      {makeLocalizedChoiceField(
-                        intl,
-                        "communication_with_audience"
-                      )}
-                      {makeLocalizedChoiceField(intl, "decision_method")}
-                      {makeLocalizedChoiceField(
-                        intl,
-                        "facetoface_online_or_both"
-                      )}
-                      {makeLocalizedBooleanField(intl, "facilitated")}
-                      {makeLocalizedChoiceField(intl, "voting")}
-                      {makeLocalizedNumberField(intl, "number_of_meeting_days")}
-                      {makeLocalizedChoiceField(
-                        intl,
-                        "targeted_participant_demographic"
-                      )}
-                      {makeLocalizedChoiceField(intl, "kind_of_influence")}
-                      {makeLocalizedChoiceField(
-                        intl,
-                        "targeted_participants_public_role"
-                      )}
-                      {makeLocalizedChoiceField(intl, "targeted_audience")}
-                      {makeLocalizedChoiceField(intl, "participant_selection")}
-                      {makeLocalizedChoiceField(intl, "type_of_funding_entity")}
-                      {makeLocalizedChoiceField(
-                        intl,
-                        "type_of_implementing_entity"
-                      )}
-                      {makeLocalizedChoiceField(
-                        intl,
-                        "type_of_sponsoring_entity"
-                      )}
-                      {}
-                      {makeLocalizedBooleanField(intl, "ongoing")}
-                      {makeLocalizedTextField(intl, "staff_type")}
-                      {makeLocalizedTextField(
-                        intl,
-                        "who_else_supported_the_initiative"
-                      )}
-                      <div className="field-case last related">
-                        <h2 className="sub-heading">
-                          <FormattedMessage id="related_content" />
-                        </h2>
-                        <h3 className="sub-sub-heading">
-                          <FormattedMessage id="related_cases_label" />
-                        </h3>
-                        {related_cases}
-                        <h3 className="sub-sub-heading mt-3">
-                          <FormattedMessage id="related_methods_label" />
-                        </h3>
-                        {related_methods}
-                        <h3 className="sub-sub-heading mt-3">
-                          <FormattedMessage id="related_organizations_label" />
-                        </h3>
-                        {related_organizations}
-                      </div>{" "}
-                    </div>
-                    {incomplete ? (
-                      <p className="pt-3 incomplete">
-                        {intl.formatMessage({
-                          id: "incomplete_" + thing.type
+                      {incomplete ? (
+                        <div className="incomplete pt-3">
+                          <FormattedMessage id={"incomplete_" + thing.type} />
+                        </div>
+                      ) : null}
+                      <RaisedButton
+                        className={
+                          this.props.new
+                            ? "new quick incomplete-warning"
+                            : "quick incomplete-warning"
+                        }
+                        disabled={incomplete}
+                        primary
+                        style={buttonStyle}
+                        type="submit"
+                        label={intl.formatMessage({
+                          id: quickSubmitText
                         })}
-                      </p>
-                    ) : null}
-                    <RaisedButton
-                      className="publish left customButton"
-                      disabled={incomplete}
-                      label="Label after"
-                      labelPosition="after"
-                      icon={<PublishIcon />}
-                      secondary
-                      style={buttonStyle}
-                      type="submit"
-                      label={intl.formatMessage({
-                        id: fullSubmitText
-                      })}
-                    />
-                  </div>
-                )}
-              </div>
-            </Col>
-          </Container>
-        </div>
-      </Form>
+                      />
+                      <RaisedButton
+                        onClick={() => onExpand(this.state.thing)}
+                        className="full-submit"
+                        style={buttonStyle}
+                        label={intl.formatMessage({ id: doFullVersion })}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <div>
+                        <label className="sub-heading" htmlFor="body_en">
+                          {intl.formatMessage({
+                            id: thing.type + "_body_title"
+                          })}
+                        </label>
+                      </div>
+                      <BodyEditor onEditorChange={this.updateBody} html={thing.body} />
+                      <div className="related-content">
+                        {makeLocalizedChoiceField(intl, "communication_mode")}
+                        {makeLocalizedChoiceField(
+                          intl,
+                          "communication_with_audience"
+                        )}
+                        {makeLocalizedChoiceField(intl, "decision_method")}
+                        {makeLocalizedChoiceField(
+                          intl,
+                          "facetoface_online_or_both"
+                        )}
+                        {makeLocalizedBooleanField(intl, "facilitated")}
+                        {makeLocalizedChoiceField(intl, "voting")}
+                        {makeLocalizedNumberField(intl, "number_of_meeting_days")}
+                        {makeLocalizedChoiceField(
+                          intl,
+                          "targeted_participant_demographic"
+                        )}
+                        {makeLocalizedChoiceField(intl, "kind_of_influence")}
+                        {makeLocalizedChoiceField(
+                          intl,
+                          "targeted_participants_public_role"
+                        )}
+                        {makeLocalizedChoiceField(intl, "targeted_audience")}
+                        {makeLocalizedChoiceField(intl, "participant_selection")}
+                        {makeLocalizedChoiceField(intl, "type_of_funding_entity")}
+                        {makeLocalizedChoiceField(
+                          intl,
+                          "type_of_implementing_entity"
+                        )}
+                        {makeLocalizedChoiceField(
+                          intl,
+                          "type_of_sponsoring_entity"
+                        )}
+                        {}
+                        {makeLocalizedBooleanField(intl, "ongoing")}
+                        {makeLocalizedTextField(intl, "staff_type")}
+                        {makeLocalizedTextField(
+                          intl,
+                          "who_else_supported_the_initiative"
+                        )}
+                        <div className="pb-1">
+                          <p className="sub-heading">
+                            <FormattedMessage id="related_content" />
+                          </p>
+                          <p className="sub-sub-heading">
+                            <FormattedMessage id="related_cases_label" />
+                          </p>
+                          {related_cases}
+                        </div>
+                        <div className="pb-1">
+                          <p className="sub-sub-heading">
+                            <FormattedMessage id="related_methods_label" />
+                          </p>
+                          {related_methods}
+                        </div>
+                        <div className="pb-1">
+                          <p className="sub-sub-heading">
+                            <FormattedMessage id="related_organizations_label" />
+                          </p>
+                          {related_organizations}
+                        </div>{" "}
+                      </div>
+                      {incomplete ? (
+                        <p className="pt-3 incomplete">
+                          {intl.formatMessage({
+                            id: "incomplete_" + thing.type
+                          })}
+                        </p>
+                      ) : null}
+                      <RaisedButton
+                        className="incomplete-warning"
+                        disabled={incomplete}
+                        primary
+                        style={buttonStyle}
+                        type="submit"
+                        label={intl.formatMessage({
+                          id: "submit_" + thing.type
+                        })}
+                      />
+                    </div>
+                  )}
+                </div>
+              </Col>
+              <FloatingActionButton
+                onTouchTap={this.onSubmit.bind(this)}
+                className="submitUIButton"
+                disabled={incomplete}
+              >
+                <Publish />
+              </FloatingActionButton>
+            </Container>
+          </div>
+        </Form>
+      </div>
     );
   }
 }
