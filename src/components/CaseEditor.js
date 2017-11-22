@@ -14,11 +14,8 @@ import FloatingActionButton from "material-ui/FloatingActionButton";
 import Publish from "material-ui/svg-icons/editor/publish";
 import fix_related from "./fix-related.js";
 import { encodeLocation } from "./geoutils";
-<<<<<<< HEAD
 import PublishIcon from "material-ui/svg-icons/editor/publish";
-=======
 import Joyride from 'react-joyride';
->>>>>>> 5037122... added feature tour, need to add handler to privateRoute
 import {
   makeLocalizedChoiceField,
   makeLocalizedBooleanField,
@@ -179,7 +176,14 @@ class CaseEditor extends Component {
     isQuick & !incomplete ? 
       steps = [
         {
-          title: 'Do Full Version',
+          title: 'Publish',
+          text: 'Click here to publish this article. Don’t leave the page without clicking this button, as your work won’t be saved. You can publish at any time and return to edit any article later. Articles that you have published will be saved to your profile page.',
+          selector: '.publish.qs',
+          position: 'top',
+          type: 'hover',
+        },
+        {
+          title: 'Full Version',
           text: 'There’s more information you can add about this case. Click here to enter more details, including a narrative description. The information you’ve already entered will carry over to the full version.',
           selector: '.full-submit',
           position: 'top',
@@ -231,23 +235,25 @@ class CaseEditor extends Component {
               />
               <Col md="6" className="ml-auto mr-auto">
                 <div className="case-box">
-                  <div className="sub-heading top">
-                    <label htmlFor="title">
-                      <FormattedMessage id={thing.type + "_title_label"} />
-                    </label>
+                  <div className="field-case top">
+                    <h2 className="sub-heading">
+                      <label htmlFor="title">
+                        <FormattedMessage id={thing.type + "_title_label"} />
+                      </label>
+                    </h2>
+                    <p className="explanatory-text"><FormattedMessage
+                      id={intl.formatMessage({
+                        id: thing.type + "_title_placeholder"
+                      })}/></p>
+                    <Field
+                      fieldName="title"
+                      name="title"
+                      className="custom-field"
+                      type={Text}
+                      placeholder=""
+                      fullWidth
+                    />
                   </div>
-                  <p className="m-0"><FormattedMessage
-                    id={intl.formatMessage({
-                      id: thing.type + "_title_placeholder"
-                    })}/></p>
-                  <Field
-                    fieldName="title"
-                    name="title"
-                    className="custom-field"
-                    type={Text}
-                    placeholder=""
-                    fullWidth
-                  />
                   {makeLocalizedChoiceField(
                     intl,
                     "issue",
@@ -278,19 +284,19 @@ class CaseEditor extends Component {
                   )}
                   <div className="case-location">
                     {makeLocalizedLocationField(intl, "location")}
-                    <p className="sub-heading">
+                    <h2 className="sub-heading">
                       <FormattedMessage id="date" />
-                    </p>
+                    </h2>
                     {makeLocalizedDateField(intl, "start_date")}
                     {makeLocalizedDateField(intl, "end_date")}
-                    <p className="sub-heading">
+                    <h2 className="sub-heading">
                       <FormattedMessage id="links" />
-                    </p>
+                    </h2>
                     {makeLocalizedListField(intl, "links")}
                   </div>
-                  <p className="sub-heading">
+                  <h2 className="sub-heading">
                     <FormattedMessage id="media" />
-                  </p>
+                  </h2>
                   <p className="sub-sub-heading">
                     <FormattedMessage id="photos" />
                   </p>
@@ -299,50 +305,51 @@ class CaseEditor extends Component {
                     <FormattedMessage id="videos" />
                   </p>
                   {makeLocalizedListField(intl, "videos")}
-                  <p className="sub-heading">
+                  <h2 className="sub-heading">
                     <FormattedMessage id="tags_title" />
-                  </p>
+                  </h2>
                   {tagseditor}
                 </div>
                 <div>
                   {isQuick ? (
                     <div>
                       {incomplete ? (
-                        <div className="incomplete pt-3">
+                        <div className="incomplete pt-4">
                           <FormattedMessage id={"incomplete_" + thing.type} />
                         </div>
                       ) : null}
                       <RaisedButton
-                        className={
-                          this.props.new
-                            ? "new quick incomplete-warning"
-                            : "quick incomplete-warning"
-                        }
+                        className="publish qs left customButton"
                         disabled={incomplete}
-                        primary
+                        label="Label after"
+                        labelPosition="after"
+                        icon={<PublishIcon />}
+                        secondary
                         style={buttonStyle}
                         type="submit"
                         label={intl.formatMessage({
                           id: quickSubmitText
                         })}
                       />
+                      <span><FormattedMessage id="or" /></span>
                       <RaisedButton
                         onClick={() => onExpand(this.state.thing)}
-                        className="full-submit"
+                        className="customButton full-submit"
                         style={buttonStyle}
+                        primary
                         label={intl.formatMessage({ id: doFullVersion })}
                       />
                     </div>
                   ) : (
                     <div>
-                      <div>
-                        <label className="sub-heading" htmlFor="body_en">
+                      <div className="field-case">
+                        <h2 className="sub-heading" htmlFor="body_en">
                           {intl.formatMessage({
                             id: thing.type + "_body_title"
                           })}
-                        </label>
+                        </h2>
+                        <BodyEditor onEditorChange={this.updateBody} html={thing.body} />
                       </div>
-                      <BodyEditor onEditorChange={this.updateBody} html={thing.body} />
                       <div className="related-content">
                         {makeLocalizedChoiceField(intl, "communication_mode")}
                         {makeLocalizedChoiceField(
@@ -385,9 +392,9 @@ class CaseEditor extends Component {
                           "who_else_supported_the_initiative"
                         )}
                         <div className="pb-1">
-                          <p className="sub-heading">
+                          <h2 className="sub-heading">
                             <FormattedMessage id="related_content" />
-                          </p>
+                          </h2>
                           <p className="sub-sub-heading">
                             <FormattedMessage id="related_cases_label" />
                           </p>
@@ -414,26 +421,33 @@ class CaseEditor extends Component {
                         </p>
                       ) : null}
                       <RaisedButton
-                        className="incomplete-warning"
+                        className="publish qs left customButton"
                         disabled={incomplete}
-                        primary
+                        label="Label after"
+                        labelPosition="after"
+                        icon={<PublishIcon />}
+                        secondary
                         style={buttonStyle}
                         type="submit"
                         label={intl.formatMessage({
-                          id: "submit_" + thing.type
+                          id: fullSubmitText
                         })}
                       />
                     </div>
                   )}
                 </div>
               </Col>
-              <FloatingActionButton
-                onTouchTap={this.onSubmit.bind(this)}
-                className="submitUIButton"
-                disabled={incomplete}
-              >
-                <Publish />
-              </FloatingActionButton>
+              {!isQuick ?
+                <FloatingActionButton
+                  onTouchTap={this.onSubmit.bind(this)}
+                  className="submitUIButton"
+                  disabled={incomplete}
+                >
+                  <Publish />
+                </FloatingActionButton>
+                :
+                <div/>
+              }
             </Container>
           </div>
         </Form>
