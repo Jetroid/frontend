@@ -186,7 +186,6 @@ export class Layout extends React.Component {
   }
 
   showTourFromHelp() {
-    console.log(this,'this')
     this.setState({ 
       isRunning: true
     });
