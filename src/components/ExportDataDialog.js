@@ -22,19 +22,19 @@ class ExportDataDialog extends Component {
     if(this.props.thingtype === 'all'){
       return;
     }
-    // retrieve the case fields
+    // retrieve the fields to populate the exclusion menu
     api.fetchFields(this.props.thingtype).then(function(fields) {
-      // isolate the fields
-      var keys = Object.keys(fields);
-      var options = [];
+      //We don't want to remove id or title, these are required fields
+      delete fields['id'];
+      delete fields['title'];
+
       // format the fields as options for the multi-select
-      for(var i = 0; i < keys.length; i++) {
+      let keys = Object.keys(fields);
+      let options = [];
+      for(let i = 0; i < keys.length; i++) {
         options.push({label: keys[i], value: keys[i]});
       }
-      // add the options to state
-      var stateOptions = component.state.options.slice();
-      Array.prototype.push.apply(stateOptions, options);
-      component.setState({options: stateOptions});
+      component.setState({options: options});
     });
   }
 
@@ -49,12 +49,10 @@ class ExportDataDialog extends Component {
     return (
       <div>
         <Dialog
-          fullscreen
+          autoScrollBodyContent={true}
           title={intl.formatMessage({ id: "export_" + this.props.thingtype })}
           actions={actions}
-          modal={false}
           open={this.props.open}
-          bodyStyle={{overflowY: "visible"}}
         >
           <ExportData
             label={intl.formatMessage({ id: "excluded_fields" })}

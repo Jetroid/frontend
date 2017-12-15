@@ -27,6 +27,8 @@ export default class ExportData extends React.Component {
 
   handleSelectChange (value) {
     this.setState({ value });
+    // Reposition the dialog - https://github.com/mui-org/material-ui/issues/5793
+    window.dispatchEvent(new Event('resize'));
   }
 
   convertValueToQueryParams(value) {
@@ -45,7 +47,6 @@ export default class ExportData extends React.Component {
   }
 
   exportData (accept) {
-    //console.log(this.state.value);
     var filter = this.convertValueToQueryParams(this.state.value);
     api.fetchAllThings(this.props.thingtype, accept, filter)
       .then(function(response) {
@@ -66,17 +67,24 @@ export default class ExportData extends React.Component {
       <div>
         <div className="section">
           <h3 className="section-heading">{this.props.label}</h3>
-          <Select
-            closeOnSelect={false}
-            multi
-            onChange={this.handleSelectChange}
-            options={this.props.options}
-            placeholder={this.props.placeholder}
-            removeSelected={this.state.removeSelected}
-            simpleValue
-            value={value}
-            menuContainerStyle={{zIndex:500}}
-          />
+          <div style={{position: "relative"}}>
+            <Select
+              closeOnSelect={false}
+              multi
+              onChange={this.handleSelectChange}
+              options={this.props.options}
+              placeholder={this.props.placeholder}
+              removeSelected={this.state.removeSelected}
+              simpleValue
+              value={value}
+              menuContainerStyle={{
+                position: "fixed",
+                zIndex: 500,
+                top: "auto",
+                width: "400px",
+              }}
+            />
+          </div>
         </div>
         <RaisedButton
           label={intl.formatMessage({ id: "export_csv" })}
