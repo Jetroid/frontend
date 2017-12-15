@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import Select from 'react-select'
 import ExportData from '../components/ExportData';
 import api from "../utils/api";
+import { injectIntl } from "react-intl";
 
 /**
  * A modal dialog can only be closed by selecting one of the actions.
  */
-export default class ExportDataDialog extends Component {
+class ExportDataDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,6 +19,9 @@ export default class ExportDataDialog extends Component {
 
   componentDidMount() {
     let component = this;
+    if(this.props.thingtype === 'all'){
+      return;
+    }
     // retrieve the case fields
     api.fetchFields(this.props.thingtype).then(function(fields) {
       // isolate the fields
@@ -66,3 +69,4 @@ export default class ExportDataDialog extends Component {
   }
 }
 
+export default injectIntl(ExportDataDialog);

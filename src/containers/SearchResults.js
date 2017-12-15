@@ -19,7 +19,7 @@ export default class SearchResults extends React.Component {
       sortingMethod: DEFAULT_SORTING_METHOD,
       selectedViewType: "grid",
       error: false,
-      showExportDialog: false
+      showExportDialog: false,
     };
   }
   componentDidMount() {
@@ -90,8 +90,7 @@ export default class SearchResults extends React.Component {
   onCategoryChange(category) {
     this._updateSearch({ selectedCategory: category });
   }
-  startDownload(category) {
-    console.log("Opening data download dialog");
+  openExportDialog(category) {
     this.setState({ showExportDialog: true });
   }
 
@@ -107,13 +106,12 @@ export default class SearchResults extends React.Component {
     let onCategoryChange = this.onCategoryChange.bind(this);
     let onLayoutChange = this.onLayoutChange.bind(this);
     let onSortingChange = this.onSortingChange.bind(this);
-    let startDownload = this.startDownload.bind(this);
+    let openExportDialog = this.openExportDialog.bind(this);
     return (
       <div>
         <ExportDataDialog
 			    open={this.state.showExportDialog}
 			    thingtype={this.state.selectedCategory}
-			    intl={this.props.intl}
 			  />
         <SearchResultsView
           location={this.props.location}
@@ -127,7 +125,7 @@ export default class SearchResults extends React.Component {
           query={this.state.query}
           onCategoryChange={onCategoryChange}
           onLayoutChange={onLayoutChange}
-          startDownload={startDownload}
+          openExportDialog={openExportDialog}
           onSortingChange={onSortingChange}
           history={this.props.history}
         />

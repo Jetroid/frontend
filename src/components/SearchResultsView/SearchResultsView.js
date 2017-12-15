@@ -422,7 +422,7 @@ export class SearchResultsView extends React.Component {
                   />
                 </div>
                 <div
-                  onClick={() => preventDefault(this.props.startDownload(this.props.selectedCategory))}
+                  onClick={() => preventDefault(this.props.openExportDialog(this.props.selectedCategory))}
                   style={{display: this.props.selectedCategory !== "all" ? "block" : "none" }}
                 >
                   <DownloadButton />

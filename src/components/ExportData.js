@@ -1,5 +1,4 @@
 import React from 'react';
-import createClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -48,12 +47,8 @@ export default class ExportData extends React.Component {
   exportData (accept) {
     //console.log(this.state.value);
     var filter = this.convertValueToQueryParams(this.state.value);
-    console.log(filter);
     api.fetchAllThings(this.props.thingtype, accept, filter)
       .then(function(response) {
-        console.log(response);
-        console.log(response.headers);
-        console.log(response.headers.get('content-disposition'));
         var filename = response.headers.get('content-disposition').match(/filename="(.+)"/)[1];
         response.text().then(function (text) {
           fileDownload(text, filename);
@@ -86,17 +81,17 @@ export default class ExportData extends React.Component {
         <RaisedButton
           label={intl.formatMessage({ id: "export_csv" })}
           style={buttonStyle}
-          onClick={() => this.exportData("text/csv")}
+          onClick={this.exportData.bind(this, "text/csv")}
         />
         <RaisedButton
           label={intl.formatMessage({ id: "export_xml" })}
           style={buttonStyle}
-          onClick={() => this.exportData("application/xml")}
+          onClick={this.exportData.bind(this, "application/xml")}
         />
         <RaisedButton
           label={intl.formatMessage({ id: "export_json" })}
           style={buttonStyle}
-          onClick={() => this.exportData("application/json")}
+          onClick={this.exportData.bind(this, "application/json")}
         />
       </div>
     );
