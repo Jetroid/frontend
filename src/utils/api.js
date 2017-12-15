@@ -99,9 +99,9 @@ class API {
       });
   };
 
-  fetchCaseFields = function() {
-    let url = APIURL + "/case/fields";
-    return signedFetch(url, "get")
+  fetchFields = function(thingtype) {
+    let url = APIURL + "/" + thingtype + "/fields";
+    return signedFetch(url)
       .then(response => response.json())
       .then(json => json.data)
       .catch(function(error) {
@@ -111,19 +111,27 @@ class API {
         throw error;
       });
   };
-  
-  fetchAllCasesJSON = function(filterArgs) {
-    let url = APIURL + "/case/all?filter=" + filterArgs;
-    return signedFetch(url, "get")
-      .then(response => response.json())
-      .then(json => json.data)
+
+  fetchAllThings = function(thingtype, accept, excludes) {
+    let url = APIURL + "/" + thingtype + "/all";
+    let opts = {
+      headers: {"Accept": accept},
+      queryParams: excludes,
+    };
+    return signedFetch(url, opts)
+      .then(function(response) {
+        if (response.status >= 400) {
+          throw new Error(response.statusText);
+        }
+        return response;
+      })
       .catch(function(error) {
         console.error(
           `There has been a problem with your fetch operation: (${url}) ${error}`
         );
-        throw error;
+        return error;
       });
-  };
+  }
 
   saveNewThing = function(thingType, obj) {
     // console.log("saveNewThing", thingType, obj);
