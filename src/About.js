@@ -1578,6 +1578,21 @@ class About extends React.Component {
                 </div>
               </AccordionTab>
             </div>
+            <h2>
+              <FormattedMessage id="attribution" />
+            </h2>
+            <div className="text">
+              <FormattedMessage id="attribution_intro" />
+            </div>
+            <div className="accordion">
+              <AccordionTab titleId="csl_project">
+                <div className="content">
+                  <p className="text">
+                    <FormattedHTMLMessage id="csl_content" />
+                  </p>
+                </div>
+              </AccordionTab>
+            </div>
           </Col>
         </Row>
       </Container>
