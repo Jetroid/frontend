@@ -1419,7 +1419,7 @@
     "export_xml": "Export XML",
     "export_json": "Export JSON",
     "excluded_fields": "Select fields to exclude from the data you export",
-    "excluded_fields_placeholder": "Select fields to exclude."
+    "excluded_fields_placeholder": "Select fields to exclude.",
     "cite_case": "Cite This Case",
     "cite_method": "Cite This Method",
     "cite_organization": "Cite This Organization",
