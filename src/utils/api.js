@@ -99,8 +99,8 @@ class API {
       });
   };
 
-  fetchFields = function(thingtype) {
-    let url = APIURL + "/" + thingtype + "/fields";
+  fetchTemplate = function(thingtype) {
+    let url = APIURL + "/" + thingtype + "/template";
     return signedFetch(url)
       .then(response => response.json())
       .then(json => json.data)
@@ -116,7 +116,7 @@ class API {
     let url = APIURL + "/" + thingtype + "/all";
     let opts = {
       headers: {"Accept": accept},
-      queryParams: excludes,
+      queryParams: { filter: JSON.stringify(excludes) },
     };
     return signedFetch(url, opts)
       .then(function(response) {

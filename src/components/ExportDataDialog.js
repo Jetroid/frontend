@@ -23,13 +23,17 @@ class ExportDataDialog extends Component {
       return;
     }
     // retrieve the fields to populate the exclusion menu
-    api.fetchFields(this.props.thingtype).then(function(fields) {
-      //We don't want to remove id or title, these are required fields
+    api.fetchTemplate(this.props.thingtype).then(function(fields) {
+      // Failure case
+      if(!fields || typeof fields !== 'object'){
+        component.setState({options: []});
+      }
+      // We don't want to give the option to remove id or title, these are required fields
       delete fields['id'];
       delete fields['title'];
 
-      // format the fields as options for the multi-select
       let keys = Object.keys(fields);
+      // format the fields as options for the multi-select
       let options = [];
       for(let i = 0; i < keys.length; i++) {
         options.push({label: keys[i], value: keys[i]});

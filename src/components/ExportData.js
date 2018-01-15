@@ -15,9 +15,7 @@ export default class ExportData extends React.Component {
     this.exportData = this.exportData.bind(this);
 
     this.state = {
-      removeSelected: true,
-      stayOpen: false,
-      value: [],
+      filters: [],
     };
   }
 
@@ -25,44 +23,28 @@ export default class ExportData extends React.Component {
     thingtype: PropTypes.string,
   };
 
-  handleSelectChange (value) {
-    this.setState({ value });
+  handleSelectChange (filters) {
+    this.setState({ filters });
     // Reposition the dialog - https://github.com/mui-org/material-ui/issues/5793
     window.dispatchEvent(new Event('resize'));
   }
 
-  convertValueToQueryParams(value) {
-    // no filtering when nothing selected
-    if(value === null || value.length < 1) {
-      return {};
-    }
-    // selected fields are converted into null objects to be passed as a GET parameter
-    let values = value.split(',');
-    let queryParams = {}
-    for(let i = 0; i < values.length; i++) {
-      let value = values[i];
-      queryParams[value] = null;
-    }
-    return queryParams;
-  }
-
   exportData (accept) {
-    var filter = this.convertValueToQueryParams(this.state.value);
+    var filter = this.state.value;
     api.fetchAllThings(this.props.thingtype, accept, filter)
-      .then(function(response) {
-        var filename = response.headers.get('content-disposition').match(/filename="(.+)"/)[1];
-        response.text().then(function (text) {
-          fileDownload(text, filename);
-        });
+    .then(function(response) {
+      var filename = response.headers.get('content-disposition').match(/filename="(.+)"/)[1];
+      response.text().then(function (text) {
+        fileDownload(text, filename);
       });
+    });
   }
 
   render () {
     let { intl } = this.props;
     const buttonStyle = {
-        margin: 12,
+        margin: '12px',
       };
-    const { value } = this.state;
     return (
       <div>
         <div className="section">
@@ -74,9 +56,8 @@ export default class ExportData extends React.Component {
               onChange={this.handleSelectChange}
               options={this.props.options}
               placeholder={this.props.placeholder}
-              removeSelected={this.state.removeSelected}
-              simpleValue
-              value={value}
+              removeSelected={true}
+              value={this.state.filters}
               menuContainerStyle={{
                 position: "fixed",
                 zIndex: 500,
